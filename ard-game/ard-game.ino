@@ -170,8 +170,7 @@ public:
             light_line[ColumnPin[j] + 16 * r] = true;
             light_line[RowPin[raw] + 16 * r] = false;
           }
-        }
-        
+        }      
       }
     }
     void LightUp(unsigned char map[][16]){
@@ -273,25 +272,30 @@ class Timer{
   public:
   int count = 0;
   int goal = 0;
+  int Do_count = 0;
   bool timervisible = true;
   bool onetime;
   int CycleTime = 0;
-  Timer(bool one_time = false){
+  Timer(bool one_time = false, bool arg_timervisible = true){
     //数値はゼロから始まり、goal_countで終了
     onetime = one_time;
+    timervisible = arg_timervisible;
   }
   bool Do(int goal_count){
     if(timervisible == true){
       count += 1;
-    }
-    if (count % goal_count == 0){
-      if(onetime == true){
-        timervisible = false;
+      if (count % goal_count == 0){
+        if(onetime == true){
+          timervisible = false;
+        }
+        CycleTime += 1;
+        return true;
       }
-      CycleTime += 1;
-      return true;
     }
     return false;
+  }
+  void Reset(){
+    CycleTime = 
   }
 };
 class Tail{
@@ -387,7 +391,6 @@ class Snake{
       if(death.Do(2) == true){
         if (tail_array[death.CycleTime].visible == true){
           tail_array[death.CycleTime].visible = false;
-
           Sound1.Play(C[1], 50);
           Sound2.Play(B[0], 50);
         }
@@ -511,8 +514,129 @@ class FroggerGame{
 };
 class Frogger{
   public:
-  
+    PlayerXY player = PlayerXY(0, 0, 5);
+    Timer update = Timer();
+    Timer death = Timer();
+    int difficulty = 1;
+    bool 
+    unsigned char map[16][16];
+
+    Frogger(){
+      linemap_reset();
+      linemap_create(0);
+    }
+    void handle_event(){
+    if(input.cross_up_key == true){
+      player.x -= 1;
+    }
+    else if(input.cross_right_key == true){
+      player.x += 1;
+    }
+    else if(input.cross_left_key == true){
+      player.y -= 1;
+    }
+    else if(input.cross_down_key == true){
+      player.y += 1;
+    }
+    if (player.x < 0){
+      player.x = 0;
+    }
+    if(player.x > 15){
+      player.y = 15;
+    }
+    if(player.y < 0){
+      player.y = 0;
+    }
+    if(player.y > 15){
+      player.y = 15;
+    }
+  }
+
+  void update(){
+    if(update.Do(10) == true){
+      if(hit_player() == true){
+        death_player();
+        player.h -= 1;
+        if(player.h)
+      }
+    }
+  }
+  void death_player(){
+
+  }
+  bool hit_player(){
+    if(map[player.y][player.x] == 1){
+      return true;
+    }
+    return false;
+  }
+  void linemap_reset(){
+    for(int i = 0; i < 16; i++){
+      for(int j = 0; j < 16; j++){
+        map[i][j] = 0;
+      }
+    }
+  }
+  void linemap_create(int create_map_difficulty = 0){
+    if(create_map_difficulty == 0){
+      for(int i = 10; i < 15; i++){
+        InsertLine(i, 4);
+      }
+      for(int i = 2; i < 9; i++){
+        InsertLine(i, 5);
+      }
+    }
+    if(create_map_difficulty == 1){
+      for(int i = 10; i < 15; i++){
+        InsertLine(i, 8);
+      }
+      for(int i = 2; i < 9; i++){
+        InsertLine(i, 7);
+      }
+    }
+    if(create_map_difficulty == 2){
+      for(int i = 10; i < 15; i++){
+        InsertLine(i, 12);
+      }
+      for(int i = 2; i < 9; i++){
+        InsertLine(i, 10);
+      }
+    }
+    if(create_map_difficulty == 3){
+      for(int i = 10; i < 15; i++){
+        InsertLine(i, 16);
+      }
+      for(int i = 2; i < 9; i++){
+        InsertLine(i, 15);
+      }
+    }
+  }
+  void InsertLine(int map_raw, int obs_num){
+    for(int i = 0; i < 16; i++){
+      map[map_raw][i] = 0;
+    }
+    int insert_index = random(0, 16);
+    for(int i = 0; i < obs_num; i++){
+      map[map_raw][insert_index] = 1;
+      insert_index += 1;
+      if(insert_index > 15){
+        insert_index = 0;
+      }
+    }
+  }
+
 };
+class PlayerXY{
+    public:
+      int x = 0;
+      int y = 0;
+      int h = 5;
+      PlayerXY(int arg_x, int arg_y, int arg_h){
+        x = arg_x;
+        y = arg_y;
+        h = arg_h;
+      }
+  }
 /*
 DotMatrix dot;
 Input input;
